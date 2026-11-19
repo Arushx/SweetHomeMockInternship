@@ -750,8 +750,18 @@ public class FurnitureTable extends JTable implements View, Printable {
           return headerRendererLabel;
         }
       };
+    List<TableColumn> printedColumns = new ArrayList<TableColumn>();
     for (int columnIndex = 0, n = columnModel.getColumnCount(); columnIndex < n; columnIndex++) {
-      final TableColumn tableColumn = columnModel.getColumn(columnIndex);
+      printedColumns.add(columnModel.getColumn(columnIndex));
+    }
+    if (columnModel instanceof FurnitureTableColumnModel) {
+      // Add Level column to printed columns only, to distinguish furniture of different levels
+      TableColumn levelColumn = ((FurnitureTableColumnModel)columnModel).getMissingLevelColumn();
+      if (levelColumn != null) {
+        printedColumns.add(levelColumn);
+      }
+    }
+    for (final TableColumn tableColumn : printedColumns) {
       // Create a printable column from existing table column
       TableColumn printableColumn = new TableColumn();
       printableColumn.setIdentifier(tableColumn.getIdentifier());
@@ -1009,8 +1019,10 @@ public class FurnitureTable extends JTable implements View, Printable {
    */
   private static class FurnitureTableColumnModel extends DefaultTableColumnModel {
     private Map<HomePieceOfFurniture.SortableProperty, TableColumn> availableColumns;
+    private final Home home;
 
     public FurnitureTableColumnModel(Home home, UserPreferences preferences) {
+      this.home = home;
       createAvailableColumns(home, preferences);
       addHomeListener(home);
       addLanguageListener(preferences);
@@ -1036,8 +1048,21 @@ public class FurnitureTable extends JTable implements View, Printable {
     }
 
     /**
-     * Adds a property change listener to home to update displayed columns list 
-     * from furniture visible properties. 
+     * Returns the Level column if home contains levels and this column isn't displayed,
+     * or <code>null</code> otherwise. The returned column isn't added to this model.
+     */
+    public TableColumn getMissingLevelColumn() {
+      if (!this.home.getLevels().isEmpty()
+          && !this.home.getFurnitureVisibleProperties().contains(HomePieceOfFurniture.SortableProperty.LEVEL)) {
+        return this.availableColumns.get(HomePieceOfFurniture.SortableProperty.LEVEL);
+      } else {
+        return null;
+      }
+    }
+
+    /**
+     * Adds a property change listener to home to update displayed columns list
+     * from furniture visible properties.
      */
     private void addHomeListener(final Home home) {
       home.addPropertyChangeListener(Home.Property.FURNITURE_VISIBLE_PROPERTIES, 

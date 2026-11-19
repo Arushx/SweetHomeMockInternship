@@ -341,7 +341,7 @@ public class HomePrintableComponent extends JComponent implements Printable {
     }
     
     View furnitureView = this.controller.getFurnitureController().getView();
-    if (furnitureView != null
+    if (furnitureView != null 
         && (homePrint == null || homePrint.isFurniturePrinted())) {
       // Try to print next furniture view page. The furniture table lists furniture
       // of every viewable level, matching the plan pages printed for each viewable level

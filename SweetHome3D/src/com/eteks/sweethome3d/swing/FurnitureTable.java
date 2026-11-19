@@ -1061,8 +1061,8 @@ public class FurnitureTable extends JTable implements View, Printable {
     }
 
     /**
-     * Adds a property change listener to home to update displayed columns list
-     * from furniture visible properties.
+     * Adds a property change listener to home to update displayed columns list 
+     * from furniture visible properties. 
      */
     private void addHomeListener(final Home home) {
       home.addPropertyChangeListener(Home.Property.FURNITURE_VISIBLE_PROPERTIES, 
